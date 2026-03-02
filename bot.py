@@ -12,7 +12,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 # ---------------- CONFIG ----------------
 import os
 TOKEN = os.getenv("8704018993:AAGeROHKAplhncfqk63I8LT21FNTZigpWFU")
-ADMIN_IDS = {1844618007}  # ваши Telegram ID: {184..., 111..., 222...}
+ADMIN_IDS = {1844618007} 
 DB_PATH = "support.db"
 
 bot = Bot(token=TOKEN)
@@ -420,4 +420,5 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
+
 
