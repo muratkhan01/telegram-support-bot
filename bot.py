@@ -10,7 +10,8 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 # ---------------- CONFIG ----------------
-TOKEN = "8704018993:AAERBbPrpEtysam1qOTr4ncTmlnfXFKbkXc"
+import os
+TOKEN = os.getenv("8704018993:AAGeROHKAplhncfqk63I8LT21FNTZigpWFU")
 ADMIN_IDS = {1844618007}  # ваши Telegram ID: {184..., 111..., 222...}
 DB_PATH = "support.db"
 
@@ -416,4 +417,5 @@ async def main():
 
 
 if __name__ == "__main__":
+
     asyncio.run(main())
