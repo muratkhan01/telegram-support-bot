@@ -10,12 +10,11 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-
 # ---------------- CONFIG ----------------
-
 ADMIN_IDS = {1844618007}
 DB_PATH = "support.db"
 
+bot: Bot | None = None
 dp = Dispatcher()
 
 print("✅ BOT LOADED: FULL_SUPPORT_V1")
@@ -123,8 +122,8 @@ def faq_menu_kb():
 
 FAQ_TEXT = {
     "faq:account": "🔐 Аккаунт: если забыли пароль — официальное восстановление. Если украли: ник/ID, последний вход, скрин/чек.",
-    "faq:payment": "💳 Донат/оплата: чек/скрин + время + сумма + способ. Если донат не пришёл — подождите 5–15 минут, если не пришло — откройте тикет.",
-    "faq:lag": "🎮 Лаг: закройте фоновые загрузки, держитесь ближе к Wi-Fi, понизьте графику. Если не помогло — откройте тикет и отправьте скрин.",
+    "faq:payment": "💳 Донат/оплата: чек/скрин + время + сумма + способ. Если донат не пришёл — подождите 5–15 минут, затем откройте тикет.",
+    "faq:lag": "🎮 Лаг: закройте фоновые приложения, используйте стабильный Wi-Fi, понизьте графику. Не помогло — откройте тикет и отправьте скрин.",
     "faq:ban": "🚫 Бан: для апелляции нужны ник, ID, сервер, время бана, причина (если есть), скрин.",
 }
 
@@ -172,18 +171,20 @@ def normalize(text: str) -> str:
 
 def quick_auto_reply(user_text: str) -> str | None:
     t = normalize(user_text)
-    if any(k in t for k in ["пароль", "құпиясөз", "password", "login"]):
+    if any(k in t for k in ["пароль", "password", "login"]):
         return "🔐 По аккаунту: /start → FAQ → Аккаунт"
-    if any(k in t for k in ["донат", "төлем", "kaspi", "qiwi", "payment", "оплата"]):
+    if any(k in t for k in ["донат", "оплата", "kaspi", "qiwi", "payment"]):
         return "💳 Донат/оплата: /start → FAQ → Донат/Оплата (нужны чек/время/сумма)"
     if any(k in t for k in ["лаг", "ping", "fps", "тормоз"]):
         return "🎮 Лаг: /start → FAQ → Лаг/Ping/FPS"
-    if any(k in t for k in ["бан", "mute", "жаза", "наказание"]):
+    if any(k in t for k in ["бан", "mute", "наказание"]):
         return "🚫 Бан: /start → FAQ → Бан/Наказание (для апелляции нужен ник/ID/сервер)"
     return None
 
 
 async def safe_send(admin_id: int, text: str, kb=None):
+    if bot is None:
+        return
     try:
         await bot.send_message(admin_id, text, reply_markup=kb)
     except Exception as e:
@@ -303,6 +304,8 @@ async def done_media(message: types.Message, state: FSMContext):
 
 @dp.message(SupportFlow.adding_media, F.photo)
 async def add_photo(message: types.Message, state: FSMContext):
+    if bot is None:
+        return
     data = await state.get_data()
     ticket_id = data.get("ticket_id")
     if not ticket_id:
@@ -322,6 +325,8 @@ async def add_photo(message: types.Message, state: FSMContext):
 
 @dp.message(SupportFlow.adding_media, F.video)
 async def add_video(message: types.Message, state: FSMContext):
+    if bot is None:
+        return
     data = await state.get_data()
     ticket_id = data.get("ticket_id")
     if not ticket_id:
@@ -374,6 +379,9 @@ async def admin_close(cb: types.CallbackQuery):
 # Admin reply -> user
 @dp.message(F.reply_to_message, F.from_user.func(lambda u: u and u.id in ADMIN_IDS))
 async def admin_reply(message: types.Message):
+    if bot is None:
+        return
+
     replied = message.reply_to_message.text or ""
     m_ticket = re.search(r"Ticket #(\d+)", replied)
     m_user = re.search(r"User ID:\s*(\d+)", replied)
@@ -413,13 +421,19 @@ async def admin_reply(message: types.Message):
 
 async def main():
     await init_db()
+
+    token = os.getenv("TOKEN")
+    if not token:
+        raise RuntimeError("TOKEN is not set in environment variables (Railway Variables).")
+
+    global bot
+    bot = Bot(token=token)
+
+    # важный фикс: чтобы polling получал обновления
     await bot.delete_webhook(drop_pending_updates=True)
+
     await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
-
     asyncio.run(main())
-
-
-
