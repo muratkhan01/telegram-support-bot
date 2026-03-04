@@ -18,18 +18,16 @@ bot: Bot | None = None
 dp = Dispatcher()
 
 
-@dp.message(Command("add"))
-async def add_command(message: Message):
-    await message.answer("Ваша заявка на рассмотрении, ожидайте ответа!")
+@dp.message_handler(commands=['add'])
+async def add_command(message: types.Message):
+    await message.reply("Ваша заявка на рассмотрении, ожидайте ответа!")
 
-@dp.message(Command("del"))
-async def del_command(message: Message):
-    await message.answer("Ваша заявка заполнена неправильно.")
+@dp.message_handler(commands=['del'])
+async def del_command(message: types.Message):
+    await message.reply("Ваша заявка заполнена неправильно.")
 
-async def main():
-    await dp.start_polling(bot)
-
-asyncio.run(main())
+if __name__ == "__main__":
+    executor.start_polling(dp, skip_updates=True)
 
 print("✅ BOT LOADED: FULL_SUPPORT_V1")
 
@@ -451,5 +449,6 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
