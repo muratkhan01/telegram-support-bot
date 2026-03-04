@@ -17,18 +17,6 @@ DB_PATH = "support.db"
 bot: Bot | None = None
 dp = Dispatcher()
 
-
-@dp.message_handler(commands=['add'])
-async def add_command(message: types.Message):
-    await message.reply("Ваша заявка на рассмотрении, ожидайте ответа!")
-
-@dp.message_handler(commands=['del'])
-async def del_command(message: types.Message):
-    await message.reply("Ваша заявка заполнена неправильно.")
-
-if __name__ == "__main__":
-    executor.start_polling(dp, skip_updates=True)
-
 print("✅ BOT LOADED: FULL_SUPPORT_V1")
 
 
