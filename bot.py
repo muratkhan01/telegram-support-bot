@@ -17,6 +17,19 @@ DB_PATH = "support.db"
 bot: Bot | None = None
 dp = Dispatcher()
 
+
+@dp.message_handler(commands=['add'])
+async def approve(message: types.Message):
+    if message.reply_to_message:
+        user_id = message.reply_to_message.from_user.id
+        await bot.send_message(user_id, "Ваша заявка на рассмотрении, ожидайте ответа!")
+
+@dp.message_handler(commands=['del'])
+async def reject(message: types.Message):
+    if message.reply_to_message:
+        user_id = message.reply_to_message.from_user.id
+        await bot.send_message(user_id, "Ваша заявка заполнена неправильно.")
+
 print("✅ BOT LOADED: FULL_SUPPORT_V1")
 
 
@@ -437,3 +450,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
