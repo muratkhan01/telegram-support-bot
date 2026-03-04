@@ -17,6 +17,7 @@ DB_PATH = "support.db"
 bot: Bot | None = None
 dp = Dispatcher()
 
+
 print("✅ BOT LOADED: FULL_SUPPORT_V1")
 
 
@@ -130,7 +131,7 @@ FAQ_TEXT = {
 
 def server_kb():
     kb = InlineKeyboardBuilder()
-    kb.button(text="🔴 Сервер 1", callback_data="srv:1")
+    kb.button(text="🔴 Moscow", callback_data="srv:1")
     kb.button(text="⬅️ Главное меню", callback_data="back:main")
     kb.adjust(1)
     return kb.as_markup()
@@ -196,7 +197,7 @@ async def safe_send(admin_id: int, text: str, kb=None):
 async def on_start(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
-        "👋 Привет! Это Tech Support бот для игры.\n"
+        "👋 Привет! Это Помощник Мура бот для игры.\n"
         "Выбери действие:",
         reply_markup=main_menu_kb()
     )
@@ -437,6 +438,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
